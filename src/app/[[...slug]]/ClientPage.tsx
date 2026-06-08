@@ -762,6 +762,18 @@ export default function CounselingSimulator() {
     };
 
     const handleLogout = () => {
+        const confirmed = window.confirm(
+            '⚠️ WARNING: Are you sure you want to logout?\n\n' +
+            'Logging out will effectively RESET ALL DATA if you are using a randomly generated CET Number. ' +
+            'This means you will lose access to:\n\n' +
+            '• All your Option Entries\n' +
+            '• All Provisional Allotment Results\n' +
+            '• All Submitted Choices\n' +
+            '• Your Candidate Profile\n\n' +
+            'Click OK to proceed and start fresh.'
+        );
+        if (!confirmed) return;
+
         setCetNo('');
         localStorage.removeItem('sim_cet_no');
         logout();
