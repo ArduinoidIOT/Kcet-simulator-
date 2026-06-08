@@ -1452,14 +1452,17 @@ export default function CounselingSimulator() {
                             </div>
 
                             {/* Box 3: ADMISSION */}
-                            <div className="border border-gray-400 flex flex-col bg-white">
-                                <div className="bg-[#1C2833] text-white text-center py-2 font-bold text-[13px] uppercase">
+                            <div className="border border-gray-300 rounded-[4px] shadow-sm flex flex-col bg-white overflow-hidden">
+                                <div className="bg-[#6c757d] text-white text-center py-[10px] text-[15px] tracking-wide" style={{ fontFamily: 'Arial, sans-serif' }}>
                                     ADMISSION
                                 </div>
-                                <div className="p-5 flex flex-col gap-4 text-[11px] font-bold min-h-[140px]">
-                                    <a href="#" className="text-blue-700 underline hover:text-blue-900 w-fit">Pay Online</a>
-                                    <div className="h-px bg-gray-200 w-full my-1" />
-                                    <a href="#" className="text-blue-700 underline hover:text-blue-900 w-fit">Payment Details</a>
+                                <div className="p-5 flex flex-col gap-4 min-h-[140px] bg-white">
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setStep('choice_entry'); }} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                        Choice Entry (Choice Print)
+                                    </a>
+                                    <a href="#" onClick={(e) => e.preventDefault()} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                        Payment Details
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1624,6 +1627,139 @@ export default function CounselingSimulator() {
                                             I Agree
                                         </button>
                                     </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {step === 'choice_entry' && mockAllotment && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="w-full max-w-[1200px] mx-auto flex flex-col items-center gap-4 text-[12px] md:text-[13px]"
+                                style={{ fontFamily: 'Arial, sans-serif' }}
+                            >
+                                <h1 className="text-[#a52a2a] text-center font-normal text-[17px] md:text-[20px] uppercase mb-2" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                    PLEASE BE CAUTIOUS WHILE EXERCISING YOUR CHOICE
+                                </h1>
+
+                                <div className="w-full border border-[#dee2e6] rounded-[4px] shadow-sm overflow-hidden bg-white">
+                                    <div className="bg-[#0052cc] text-white text-center py-2 flex flex-col">
+                                        <span className="font-bold text-[15px]">CHOICE ENTRY</span>
+                                        <span className="text-[12px] opacity-90">You are allotted seat as details given below</span>
+                                    </div>
+                                    <div className="p-4 md:p-6 grid grid-cols-[80px_1fr] md:grid-cols-[100px_1fr] gap-y-[10px] bg-white">
+                                        <div className="font-bold text-gray-700">Stream:</div>
+                                        <div className="text-gray-900">Engineering</div>
+                                        <div className="font-bold text-gray-700">College:</div>
+                                        <div className="text-[#a52a2a] uppercase">{mockAllotment.collegeName}</div>
+                                        <div className="font-bold text-gray-700">Course:</div>
+                                        <div className="text-[#a52a2a] uppercase">{mockAllotment.branchName} ({mockAllotment.branchId})</div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-4 w-full mt-2">
+                                    {/* Choice 1 */}
+                                    <div className="border border-[#badbcc] bg-[#e8f4ed] p-4 rounded-[4px] text-[#0f5132] cursor-pointer transition-colors" onClick={() => setSelectedChoice(1)}>
+                                        <div className="flex items-start gap-2 font-bold mb-[6px]">
+                                            <input type="radio" checked={selectedChoice === 1} onChange={() => setSelectedChoice(1)} className="mt-[2px]" />
+                                            <span>Choice-1 (Satisfied): 1. I am 100% satisfied about the seat allotted in the first round. I will join the college and do not need any change. Hence, I should not be considered for further rounds of seat allotment.</span>
+                                        </div>
+                                        <div className="pl-6 space-y-[4px]">
+                                            <p>2. Also I do not want to participate in the next rounds (for courses like UGNEET- Medical or Dental or AYUSH or UGCET-Engineering / Architecture / Farm Science / Veterinary / Pharmacy / B.Sc Nursing, Naturopathy and Yoga, Allied Health Science etc.)</p>
+                                            <p>3. I hereby confirm that, I will pay the fee for the seat allotted in the first round, download the Confirmation Slip and then get the OTP through the college portal login by Online Face Recognition, verify the eligibility, download the admit card and get admission within the stipulated date and time.</p>
+                                            <p>4. Any CHOICE-1 selected candidate fails to pay the fees or paid the fees but failed to download the Confirmation Slip or fails to report to the College, he / she has no claim further on such allotment, revert back to the seat matrix, and he / she will not be considered for allotment of seats in the subsequent rounds, fee paid if any will be forfeited.</p>
+                                            <p>For further details visit KEA Website (https://cetonline.karnataka.gov.in/kea/ugcet2025)</p>
+                                            
+                                            <p className="mt-[10px] font-bold">1. ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟು ನನಗೆ ಶೇ. 100 ರಷ್ಟು ಇಷ್ಟವಾಗಿದೆ. ನಾನು ಕಾಲೇಜಿಗೆ ಸೇರಲು ಇಚ್ಚಿಸುತ್ತೇನೆ ಮತ್ತು ನನಗೆ ಯಾವುದೇ ಬದಲಾವಣೆ ಅವಶ್ಯಕತೆ ಇರುವುದಿಲ್ಲ. ಆದ್ದರಿಂದ ನನ್ನನ್ನು ಮುಂದಿನ ಯಾವುದೇ ಸುತ್ತುಗಳ ಸೀಟು ಹಂಚಿಕೆಗೆ ಪರಿಗಣಿಸಬಾರದು.</p>
+                                            <p>2. ಮುಂದಿನ ಸುತ್ತುಗಳಲ್ಲಿ (ಯುಜಿನೀಟ್-ವೈದ್ಯಕೀಯ ಅಥವಾ ದಂತ ವೈದ್ಯಕೀಯ ಅಥವಾ ಆಯುಷ್ ಅಥವಾ ಇಂಜಿನಿಯರಿಂಗ್ / ಆರ್ಕಿಟೆಕ್ಚರ್ / ಫಾರ್ಮ ಸೈನ್ಸ್ / ವೆಟರ್ನರಿ / ಫಾರ್ಮಸಿ / ಬಿ.ಎಸ್ಸಿ ನರ್ಸಿಂಗ್, ನ್ಯಾಚುರೋಪತಿ ಮತ್ತು ಯೋಗ, ಅಲೈಡ್ ಹೆಲ್ತ್ ಸೈನ್ಸ್ ಮುಂತಾದ ಕೋರ್ಸುಗಳಿಗೆ) ಭಾಗವಹಿಸಲು ಇಚ್ಛಿಸುವುದಿಲ್ಲ.</p>
+                                            <p>3. ನಾನು ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟಿಗೆ ಶುಲ್ಕವನ್ನು ಪಾವತಿಸಿ, Confirmation Slip ಅನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಿಕೊಂಡು ನಂತರ ಕಾಲೇಜಿನ ಪೋರ್ಟಲ್ ಲಾಗಿನ್ ಮೂಲಕ ಒಟಿಪಿ ಪಡೆದು, Online Face Recognition ಮಾಡಿ, ಪ್ರವೇಶ ಪತ್ರ ಡೌನ್ಲೋಡ್ ಮಾಡಿ, ನಿಗದಿತ ದಿನಾಂಕದೊಳಗೆ ಪ್ರವೇಶ ಪಡೆಯಲು ಇಚ್ಛಿಸುತ್ತೇನೆ.</p>
+                                            <p>4. CHOICE-1 ಆಯ್ಕೆ ಮಾಡಿದ ಅಭ್ಯರ್ಥಿಯು ಶುಲ್ಕವನ್ನು ಪಾವತಿಸಲು ವಿಫಲನಾದಲ್ಲಿ ಅಥವಾ ಶುಲ್ಕ ಪಾವತಿಸಿ, Confirmation Slip ಅನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಲು ವಿಫಲನಾದಲ್ಲಿ ಅಥವಾ ಕಾಲೇಜಿಗೆ ವರದಿ ಮಾಡಲು ವಿಫಲರಾದಲ್ಲಿ ಅಂತಹ ಅಭ್ಯರ್ಥಿಗಳನ್ನು ಮುಂದಿನ ಸುತ್ತುಗಳ ಸೀಟು ಹಂಚಿಕೆಗೆ ಪರಿಗಣಿಸಲಾಗುವುದಿಲ್ಲ, ಪಾವತಿಸಿದ ಶುಲ್ಕವಿದ್ದಲ್ಲಿ ಮುಟ್ಟುಗೋಲು ಹಾಕಿಕೊಳ್ಳಲಾಗುವುದು.</p>
+                                            <p>ಹೆಚ್ಚಿನ ವಿವರಗಳಿಗಾಗಿ ಕೆಇಎ ವೆಬ್ಸೈಟ್ (https://cetonline.karnataka.gov.in/kea/ugcet2025) ಗೆ ಭೇಟಿ ನೀಡಿ.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Choice 2 */}
+                                    <div className="border border-[#ffecb5] bg-[#fff8e6] p-4 rounded-[4px] text-[#664d03] cursor-pointer transition-colors" onClick={() => setSelectedChoice(2)}>
+                                        <div className="flex items-start gap-2 font-bold mb-[6px]">
+                                            <input type="radio" checked={selectedChoice === 2} onChange={() => setSelectedChoice(2)} className="mt-[2px]" />
+                                            <span>Choice-2 (Hold): 1. Candidate wants the seat allotted in the first round but he/she wants to participate in the second round to get a better seat.</span>
+                                        </div>
+                                        <div className="pl-6 space-y-[4px]">
+                                            <p>2. If any seat is allotted in the higher order options on the basis of merit in the second round, he/she will take the seat allotted in the second round.</p>
+                                            <p>3. In case no seat is allotted on the basis of merit in the second round, candidate confirms that the seat already allotted in the first round will remain.</p>
+                                            <p>4. Candidates can alter / delete / reorder / modify the higher order options in the second round option entry portal. Wait for the second round option entry and seat allotment schedule.</p>
+                                            <p>5. Fee Payment details for the seat allotted candidates in the First Round:</p>
+                                            <ul className="list-disc pl-5">
+                                                <li>Candidate allotted with UGNEET seat in Medical / Dental / AYUSH should pay the prescribed fees.</li>
+                                                <li>Candidate allotted seat in UGCET courses like Engineering / Architecture / Farm Sciences / Veterinary / B.Sc. Nursing / B-Pharma / Pharm-D / Yoga & Naturopathy etc need not have to pay the fees.</li>
+                                            </ul>
+                                            <p>For further details visit KEA Website (https://cetonline.karnataka.gov.in/kea/ugcet2025)</p>
+
+                                            <p className="mt-[10px] font-bold">1. ಅಭ್ಯರ್ಥಿಗಳಿಗೆ ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟು ಇಷ್ಟವಾಗಿರುತ್ತದೆ. ಆದರೆ ಅವನು/ಅವಳು ಇನ್ನೂ ಉತ್ತಮವಾದ ಸೀಟನ್ನು ಪಡೆಯಲು ಮುಂದಿನ ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಭಾಗವಹಿಸಲಿಚ್ಛಿಸುತ್ತಾನೆ/ಳೆ.</p>
+                                            <p>2. ಮುಂದಿನ ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಮೆರಿಟ್ ಆಧಾರದ ಮೇಲೆ Higher Order Options ಗಳಲ್ಲಿ ಯಾವುದೇ ಸೀಟು ಹಂಚಿಕೆಯಾದಲ್ಲಿ, ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟನ್ನು ಅಭ್ಯರ್ಥಿಯು ಪಡೆಯಲಿಚ್ಛಿಸುತ್ತಾನೆ/ಳೆ.</p>
+                                            <p>3. ಒಂದು ವೇಳೆ ಮುಂದಿನ ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಮೆರಿಟ್ ಆಧಾರದ ಮೇಲೆ higher order options ಗಳಲ್ಲಿ ಯಾವುದೇ ಸೀಟು ಹಂಚಿಕೆಯಾಗದಿದ್ದಲ್ಲಿ, ಈಗಾಗಲೇ ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟೇ ಉಳಿಯುತ್ತದೆ.</p>
+                                            <p>4. ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಅಭ್ಯರ್ಥಿಗಳು ದಾಖಲಿಸಿದ higher order options গুলোকে ಮಾತ್ರ ತೋರಿಸಲಾಗುವುದು. ಅಭ್ಯರ್ಥಿಗಳು ಎರಡನೇ ಸುತ್ತಿನ ಪ್ರಕ್ರಿಯೆ ಪ್ರಾರಂಭವಾದ ನಂತರ higher order options ಗಳನ್ನು ಮರುಕ್ರಮಗೊಳಿಸಬಹುದು ಅಥವಾ ಆದ್ಯತಾ ಕ್ರಮಗಳನ್ನು ಮಾರ್ಪಡಿಸಿಕೊಳ್ಳಬಹುದು ಅಥವಾ ಯಾವುದಾದರೂ options ಬೇಡವಾದಲ್ಲಿ ಅಳಿಸಿಹಾಕಬಹುದು / ತೆಗೆದು ಹಾಕಬಹುದು.</p>
+                                            <p>5. ಮೊದಲ ಸುತ್ತಿನಲ್ಲಿ ಸೀಟು ಹಂಚಿಕೆಯಾದ ಅಭ್ಯರ್ಥಿಗಳಿಗೆ ಶುಲ್ಕ ಪಾವತಿಯ ವಿವರ:</p>
+                                            <ul className="list-disc pl-5">
+                                                <li>ಯುಜಿನೀಟ್ ಕೋರ್ಸುಗಳಾದ ವೈದ್ಯಕೀಯ, ದಂತವೈದ್ಯಕೀಯ, ಹೋಮಿಯೋಪತಿ ಸೀಟು ಹಂಚಿಕೆಯಾದ ಅಭ್ಯರ್ಥಿಗಳು ನಿಗದಿತ ಶುಲ್ಕವನ್ನು ಪಾವತಿಸಬೇಕು.</li>
+                                                <li>ಯುಜಿಸಿಇಟಿ ಕೋರ್ಸುಗಳಾದ ಇಂಜಿನಿಯರಿಂಗ್, ಆರ್ಕಿಟೆಕ್ಚರ್, ಯೋಗ ಮತ್ತು ನ್ಯಾಚುರೋಪತಿ, ಫಾರ್ಮ ಸೈನ್ಸ್, ವೆಟರ್ನರಿ, ಬಿ-ಫಾರ್ಮ, ಫಾರ್ಮಾ-ಡಿ, ಬಿ.ಎಸ್ಸಿ (ನರ್ಸಿಂಗ್), ಬಿಪಿಟಿ, ಬಿಪಿಒ, ಅಲೈಡ್ ಹೆಲ್ತ್ ಸೈನ್ಸ್ ಕೋರ್ಸುಗಳಲ್ಲಿ ಸೀಟು ಹಂಚಿಕೆಯಾದ ಅಭ್ಯರ್ಥಿಗಳು ಶುಲ್ಕ ಪಾವತಿಸುವ ಅವಶ್ಯಕತೆ ಇರುವುದಿಲ್ಲ.</li>
+                                            </ul>
+                                            <p>ಹೆಚ್ಚಿನ ವಿವರಗಳಿಗಾಗಿ ಕೆಇಎ ವೆಬ್ಸೈಟ್ (https://cetonline.karnataka.gov.in/kea/ugcet2025) ಗೆ ಭೇಟಿ ನೀಡಿ.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Choice 3 */}
+                                    <div className="border border-[#b6effb] bg-[#e0f7fa] p-4 rounded-[4px] text-[#055160] cursor-pointer transition-colors" onClick={() => setSelectedChoice(3)}>
+                                        <div className="flex items-start gap-2 font-bold mb-[6px]">
+                                            <input type="radio" checked={selectedChoice === 3} onChange={() => setSelectedChoice(3)} className="mt-[2px]" />
+                                            <span>Choice-3 (Not Interested): 1. Candidate is not satisfied with allotted seat.</span>
+                                        </div>
+                                        <div className="pl-6 space-y-[4px]">
+                                            <p>2. Candidate wishes to participate in the second round option entry by surrendering the allotted seat.</p>
+                                            <p>3. The candidates after logging in and agreeing to the terms and conditions, all the options entered by the candidates in the first round will be shown (except the allotted option for the candidate in the first round). The candidates can modify only the options they want in any order. The options removed by the candidate will remain on the left-hand side screen and such options will not be considered.</p>
+                                            <p>4. Consequential vacancies that arise after their turn cannot be claimed. Chances of getting the lower order options is subject to availability of seats as the other candidates next to your rank might have entered those options and seat would have been allotted to them based on merit.</p>
+                                            <p>5. The candidates who exercise CHOICE-3 need not pay the fees for the allotted seat but, if the candidate likes to participate with un-allotted medical seat in the second round, then he / she has to pay the caution deposit.</p>
+                                            <p>For further details visit KEA Website (https://cetonline.karnataka.gov.in/kea/ugcet2025)</p>
+
+                                            <p className="mt-[10px] font-bold">1. ಅಭ್ಯರ್ಥಿಗೆ ಮೊದಲ ಸುತ್ತಿನಲ್ಲಿ ದೊರೆತಿರುವ ಸೀಟು ತೃಪ್ತಿಕರವಾಗಿಲ್ಲ.</p>
+                                            <p>2. ಅಭ್ಯರ್ಥಿಯು ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟನ್ನು ರದ್ದುಪಡಿಸಿಕೊಂಡು ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಭಾಗವಹಿಸಲಿಚ್ಛಿಸುತ್ತಾರೆ.</p>
+                                            <p>3. ಅಭ್ಯರ್ಥಿಗಳು ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಇಚ್ಛೆ/ಆಯ್ಕೆಗಳನ್ನು ದಾಖಲಿಸುವ ಪ್ರಕ್ರಿಯೆ ಪ್ರಾರಂಭಿಸಿದ ನಂತರ option entry portal ನಲ್ಲಿ ಲಾಗಿನ್ ಮಾಡಿ ಒಪ್ಪಿಗೆ ನೀಡಿದ ನಂತರ ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಅವರು ದಾಖಲಿಸಿದ ಎಲ್ಲಾ options ಗಳನ್ನು ತೋರಿಸಲಾಗುವುದು (ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾಗಿ ಅಭ್ಯರ್ಥಿಯು ರದ್ದುಪಡಿಸಿಕೊಂಡ option ಅನ್ನು ಹೊರತುಪಡಿಸಿ ಉಳಿದ ಎಲ್ಲಾ ಇಚ್ಛೆ/ಆಯ್ಕೆಗಳು). ಅಭ್ಯರ್ಥಿಗಳು ತಮಗೆ ಬೇಕಾಗಿರುವ options ಗಳನ್ನು ಮಾತ್ರ ಯಾವುದೇ ಕ್ರಮದಲ್ಲಿ ಬೇಕಾದರೂ ಮಾರ್ಪಡಿಸಿಕೊಳ್ಳಬಹುದು. ಯಾವುದೇ ಬೇಡವೋ ಅಂತಹ options ಗಳನ್ನು ಅಳಿಸಿಕೊಳ್ಳುವ ಅಗತ್ಯ ಇರುವುದಿಲ್ಲ, ತೆಗೆದು ಹಾಕಬಹುದು. ನೀವು ತೆಗೆದು ಹಾಕುವ options ಗಳು ನಿಮ್ಮ ಎಡಭಾಗದ ಸ್ಕ್ರೀನ್ ನಲ್ಲಿಯೇ ಇರುತ್ತವೆ ಮತ್ತು ಅಂತಹ options ಗಳನ್ನು ಪರಿಗಣಿಸುವುದಿಲ್ಲ.</p>
+                                            <p>4. ಅಭ್ಯರ್ಥಿ ತಮ್ಮ ರ್ಯಾಂಕ್ ಸರದಿಯ ನಂತರ ನಮೂದಿಸಿರುವ ಉದ್ಭವಿಸುವ ಸೀಟುಗಳನ್ನು ಪಡೆಯಲು ಹಕ್ಕನ್ನು ಚಲಾಯಿಸುವಂತಿಲ್ಲ. ಇಚ್ಛೆ/ಆಯ್ಕೆಗಳನ್ನು ಹೊಸದಾಗಿ ಸೇರಿಸಲು ಅವಕಾಶವಿರುವುದಿಲ್ಲ. ಒಂದು ವೇಳೆ ಸೀಟ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಗೆ ಹೊಸದಾಗಿ ಕಾಲೇಜು ಅಥವಾ ಕೋರ್ಸುಗಳು ಸೇರ್ಪಡೆಯಾದಲ್ಲಿ ಮಾತ್ರ options ಗಳನ್ನು ಸೇರಿಸಲು ಅವಕಾಶವಿರುತ್ತದೆ.</p>
+                                            <p>5. CHOICE-3 ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಿಕೊಂಡಿರುವ ಅಭ್ಯರ್ಥಿಗಳು ಮೊದಲನೇ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾದ ಸೀಟಿಗೆ ಶುಲ್ಕವನ್ನು ಪಾವತಿಸುವ ಅಗತ್ಯವಿರುವುದಿಲ್ಲ. ಆದರೆ, ಒಂದು ವೇಳೆ ಅಭ್ಯರ್ಥಿಯು ವೈದ್ಯಕೀಯ ಕೋರ್ಸಿಗೆ ಈಗಾಗಲೇ ದಾಖಲಿಸಿರುವ options ಗಳೊಂದಿಗೆ ಎರಡನೇ ಸುತ್ತಿನಲ್ಲಿ ಭಾಗವಹಿಸಲು ಇಚ್ಛಿಸಿದಲ್ಲಿ CAUTION DEPOSIT ಅನ್ನು ಪಾವತಿಸಬೇಕು.</p>
+                                            <p>ಹೆಚ್ಚಿನ ವಿವರಗಳಿಗಾಗಿ ಕೆಇಎ ವೆಬ್ಸೈಟ್ (https://cetonline.karnataka.gov.in/kea/ugcet2025) ಗೆ ಭೇಟಿ ನೀಡಿ.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Choice 4 */}
+                                    <div className="border border-[#f5c2c7] bg-[#fdf2f3] p-4 rounded-[4px] text-[#842029] cursor-pointer transition-colors" onClick={() => setSelectedChoice(4)}>
+                                        <div className="flex items-start gap-2 font-bold mb-[6px]">
+                                            <input type="radio" checked={selectedChoice === 4} onChange={() => setSelectedChoice(4)} className="mt-[2px]" />
+                                            <span>Choice-4 (Quit): 1. Candidate is not satisfied with the allotted seat and has got seat elsewhere. Hence the candidate quit the counseling process.</span>
+                                        </div>
+                                        <div className="pl-6 space-y-[4px]">
+                                            <p>2. Candidate is not eligible to participate in UGCET-2025 or UGNEET-2025 subsequent rounds and no hold on the allotted seat and seat allotted earlier will get cancelled.</p>
+                                            <p>For further details visit KEA Website (https://cetonline.karnataka.gov.in/kea/ugcet2025)</p>
+
+                                            <p className="mt-[10px] font-bold">1. ಅಭ್ಯರ್ಥಿಗೆ ಮೊದಲ ಸುತ್ತಿನಲ್ಲಿ ಹಂಚಿಕೆಯಾಗಿರುವ ಸೀಟು ತೃಪ್ತಿಕರವಾಗಿಲ್ಲ ಮತ್ತು ಅಭ್ಯರ್ಥಿಗೆ ಬೇರೆಡೆ ಸೀಟು ದೊರಕಿದೆ. ಆದ್ದರಿಂದ ಕೌನ್ಸೆಲಿಂಗ್ ಪ್ರಕ್ರಿಯೆಯಿಂದ ಹೊರಹೋಗಲು ಇಚ್ಛಿಸುತ್ತಾರೆ. ನನಗೆ ಮುಂದಿನ ಸುತ್ತಿನಲ್ಲೂ ಸಹ ಯಾವುದೇ ಸೀಟು ತೆಗೆದುಕೊಳ್ಳಲು ಇಷ್ಟವಿಲ್ಲ.</p>
+                                            <p>2. ಅಭ್ಯರ್ಥಿಯು ಯುಜಿಸಿಇಟಿ-2025 ಅಥವಾ ಯುಜಿನೀಟ್-2025ರ ಕೋರ್ಸುಗಳ ಸೀಟು ಹಂಚಿಕೆಯ ಮುಂದಿನ ಯಾವುದೇ ಸುತ್ತುಗಳಲ್ಲಿ ಭಾಗವಹಿಸಲು ಅರ್ಹರಾಗುವುದಿಲ್ಲ.</p>
+                                            <p>ಹೆಚ್ಚಿನ ವಿವರಗಳಿಗಾಗಿ ಕೆಇಎ ವೆಬ್ಸೈಟ್ (https://cetonline.karnataka.gov.in/kea/ugcet2025) ಗೆ ಭೇಟಿ ನೀಡಿ.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 flex justify-center w-full">
+                                    <button 
+                                        onClick={handleSubmitChoice}
+                                        className="bg-[#0d6efd] hover:bg-[#0b5ed7] text-white px-10 py-2 rounded-[4px] text-[15px] shadow-sm"
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+
+                                <div className="w-full mt-6 border border-[#bee5eb] bg-[#d1ecf1] text-[#0c5460] p-4 rounded-[4px] text-[13px]">
+                                    <p className="font-bold mb-1">NOTE: TO SEAT 'ALLOTTED' CANDIDATES:</p>
+                                    <p>If a candidate fails to exercise any of the above 4 choices within the stipulated date and time, then the seat allotted to such candidate stands cancelled automatically without any further notice. They will not be allowed to participate in further rounds.</p>
                                 </div>
                             </motion.div>
                         )}
