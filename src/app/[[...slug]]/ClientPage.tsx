@@ -304,6 +304,12 @@ export default function CounselingSimulator() {
     });
     const [hasAgreedDeclaration, setHasAgreedDeclaration] = useState(false);
     const [isDeclarationChecked, setIsDeclarationChecked] = useState(false);
+    const [isPaymentComplete, setIsPaymentComplete] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('sim_payment_complete') === 'true';
+        }
+        return false;
+    });
 
     // Load data
     const data = require('@/lib/data/colleges_unified.json');
@@ -463,6 +469,12 @@ export default function CounselingSimulator() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            localStorage.setItem('sim_payment_complete', String(isPaymentComplete));
+        }
+    }, [isPaymentComplete]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
             localStorage.setItem('sim_submitted_round', String(submittedRound));
         }
     }, [submittedRound]);
@@ -492,6 +504,7 @@ export default function CounselingSimulator() {
                 if (saved.choiceSubmitted) setChoiceSubmitted(saved.choiceSubmitted);
                 if (saved.submittedRound) setSubmittedRound(saved.submittedRound);
                 if (saved.previousAllotment) setPreviousAllotment(saved.previousAllotment);
+                if (saved.isOptionsLocked !== undefined) setIsOptionsLocked(saved.isOptionsLocked);
 
                 if (saved.step) {
                     setStep(saved.step as any);
@@ -519,6 +532,7 @@ export default function CounselingSimulator() {
                 currentRound: globalConfig?.currentRound || 1,
                 submittedRound: submittedRound,
                 previousAllotment: previousAllotment,
+                isOptionsLocked: isOptionsLocked,
                 updatedAt: new Date().toISOString(),
                 ...extraData
             };
@@ -529,12 +543,15 @@ export default function CounselingSimulator() {
     };
 
     // --- Global Config Fetching ---
-    const [globalConfig] = useState<any>({
+    const [globalConfig, setGlobalConfig] = useState<any>({
         currentRound: 1,
         isResultsLive: true,
         resultsReleaseDate: "2025-06-15T10:00:00Z",
         nextRoundStartDate: "2025-06-20T10:00:00Z"
     });
+
+    const [isOptionsLocked, setIsOptionsLocked] = useState(false);
+    const [showChoiceConfirm, setShowChoiceConfirm] = useState(false);
 
     // --- Simulator State ---
     const [selectedStream, setSelectedStream] = useState<'course' | 'college'>('course');
@@ -776,7 +793,8 @@ export default function CounselingSimulator() {
                 }
             }
             setMockAllotment(allottedSeat);
-            await saveSimulationState('landing', { mockAllotment: allottedSeat });
+            setIsOptionsLocked(true);
+            await saveSimulationState('landing', { mockAllotment: allottedSeat, isOptionsLocked: true });
             setStep('landing');
         }, 1500);
     };
@@ -896,6 +914,10 @@ export default function CounselingSimulator() {
             alert('Please select a choice before submitting.');
             return;
         }
+        setShowChoiceConfirm(true);
+    };
+
+    const handleChoiceConfirmSubmit = async () => {
         setChoiceSubmitted(true);
         setSubmittedRound(globalConfig.currentRound);
 
@@ -914,7 +936,9 @@ export default function CounselingSimulator() {
             updateData.previousAllotment = null;
         }
 
-        await saveSimulationState('allotted', updateData);
+        setShowChoiceConfirm(false);
+        await saveSimulationState('landing', updateData);
+        setStep('landing');
     };
 
     const choiceDescriptions = [
@@ -1372,19 +1396,25 @@ export default function CounselingSimulator() {
                                     <div className="h-px bg-gray-300 w-[85%]" />
                                 </div>
                                 <div>
-                                    <a href="#" className="text-black hover:text-gray-700 cursor-pointer">Option Entry Example</a>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); alert('Example PDF downloaded.'); }} className="text-black font-bold hover:text-gray-700 cursor-pointer">Option Entry Example</a>
                                     <div className="h-px bg-gray-300 w-[85%] mt-3" />
                                 </div>
                                 <div>
-                                    <a href="#" className="text-black hover:text-gray-700 cursor-pointer">Detailed Option Work Sheet</a>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); alert('Detailed Work Sheet downloaded.'); }} className="text-black font-bold hover:text-gray-700 cursor-pointer">Detailed Option Work Sheet</a>
                                     <div className="h-px bg-gray-300 w-[85%] mt-3" />
                                 </div>
                                 <div className="pb-4">
-                                    <a href="#" className="text-black hover:text-gray-700 cursor-pointer">Print Option Report</a>
+                                    <a href="#" onClick={(e) => {
+                                        e.preventDefault();
+                                        handleDownloadReport();
+                                    }} className="text-black font-bold hover:text-gray-700 cursor-pointer">Print Option Report</a>
                                     <p className="mt-3">
-                                        <a href="#" className="text-black hover:text-gray-700 cursor-pointer">Download Option Entry Report</a>
+                                        <a href="#" onClick={(e) => {
+                                            e.preventDefault();
+                                            handleDownloadReport();
+                                        }} className="text-black font-bold hover:text-gray-700 cursor-pointer">Download Option Entry Report</a>
                                     </p>
-                                    <p className="text-black font-normal mt-5 leading-relaxed pr-4">
+                                    <p className="text-black font-normal mt-5 leading-relaxed pr-4 text-[13px]">
                                         Click the 'Download Option Entry Report' link to download the option entry printout, which closes on 2026/06/25 00:00:00
                                     </p>
                                 </div>
@@ -1457,12 +1487,41 @@ export default function CounselingSimulator() {
                                     ADMISSION
                                 </div>
                                 <div className="p-5 flex flex-col gap-4 min-h-[140px] bg-white">
-                                    <a href="#" onClick={(e) => { e.preventDefault(); setStep('choice_entry'); }} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit" style={{ fontFamily: 'Arial, sans-serif' }}>
-                                        Choice Entry (Choice Print)
-                                    </a>
-                                    <a href="#" onClick={(e) => e.preventDefault()} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit" style={{ fontFamily: 'Arial, sans-serif' }}>
-                                        Payment Details
-                                    </a>
+                                    {choiceSubmitted ? (
+                                        selectedChoice === 1 ? (
+                                            <>
+                                                {isPaymentComplete ? (
+                                                    <a href="#" onClick={(e) => { e.preventDefault(); setStep('payment_receipt'); }} className="text-[12px] text-[#006400] hover:text-[#004d00] underline w-fit font-bold" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                                        Print Payment Receipt
+                                                    </a>
+                                                ) : (
+                                                    <>
+                                                        <a href="#" onClick={(e) => { e.preventDefault(); setStep('payment'); }} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit font-bold" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                                            Pay Fees / Download Admission Order
+                                                        </a>
+                                                        <p className="text-[11px] text-gray-600">You have accepted the seat. Please complete payment to download your admission order.</p>
+                                                    </>
+                                                )}
+                                            </>
+                                        ) : selectedChoice === 4 ? (
+                                            <span className="text-[12px] text-red-600 font-bold" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                                You have exited the counseling process. No further action required.
+                                            </span>
+                                        ) : (
+                                            <span className="text-[12px] text-[#006400] font-bold" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                                Choice {selectedChoice} Submitted. Please wait for Round {globalConfig.currentRound + 1}.
+                                            </span>
+                                        )
+                                    ) : (
+                                        <>
+                                            <a href="#" onClick={(e) => { e.preventDefault(); setStep('choice_entry'); }} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                                Choice Entry (Choice Print)
+                                            </a>
+                                            <a href="#" onClick={(e) => { e.preventDefault(); setStep('payment'); }} className="text-[12px] text-[#0000ee] hover:text-[#0000ee] underline w-fit" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                                Payment Details
+                                            </a>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1573,6 +1632,17 @@ export default function CounselingSimulator() {
                             </button>
                             <button
                                 onClick={() => {
+                                    setGlobalConfig((prev: any) => ({ ...prev, currentRound: prev.currentRound < 3 ? prev.currentRound + 1 : 1 }));
+                                    setIsOptionsLocked(false);
+                                    setMockAllotment(null); // Reset allotment for next round
+                                    alert(`Advanced to Round ${globalConfig.currentRound < 3 ? globalConfig.currentRound + 1 : 1}! Option Entry is unlocked.`);
+                                }}
+                                className="px-[10px] py-[2px] text-[11px] font-bold border border-rose-500 rounded-[3px] bg-rose-50 text-rose-700 hover:bg-rose-100 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                            >
+                                Simulate Round: {globalConfig.currentRound}
+                            </button>
+                            <button
+                                onClick={() => {
                                     setCetNo('');
                                     localStorage.removeItem('sim_cet_no');
                                     setStep('login');
@@ -1631,7 +1701,14 @@ export default function CounselingSimulator() {
                             </motion.div>
                         )}
 
-                        {step === 'choice_entry' && mockAllotment && (
+                        {step === 'choice_entry' && (
+                            !mockAllotment ? (
+                                <div className="flex flex-col items-center justify-center p-12 text-center w-full min-h-[50vh]">
+                                    <h3 className="text-xl font-bold text-[#a52a2a]">No Seat Allotted</h3>
+                                    <p className="text-gray-600 mt-2">You do not have any seat allotted in this round, so you cannot exercise choices.</p>
+                                    <button onClick={() => setStep('landing')} className="mt-6 bg-[#000080] text-white px-6 py-2 rounded shadow-sm hover:bg-blue-800 transition-colors text-sm font-bold">Back to Dashboard</button>
+                                </div>
+                            ) : (
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -1748,7 +1825,7 @@ export default function CounselingSimulator() {
                                     </div>
                                 </div>
 
-                                <div className="mt-4 flex justify-center w-full">
+                                <div className="mt-4 flex justify-center w-full relative">
                                     <button 
                                         onClick={handleSubmitChoice}
                                         className="bg-[#0d6efd] hover:bg-[#0b5ed7] text-white px-10 py-2 rounded-[4px] text-[15px] shadow-sm"
@@ -1757,11 +1834,150 @@ export default function CounselingSimulator() {
                                     </button>
                                 </div>
 
+                                {showChoiceConfirm && (
+                                    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+                                        <div className="bg-white rounded-[4px] p-6 max-w-md w-full shadow-xl">
+                                            <h3 className="text-xl font-bold text-[#a52a2a] mb-4 border-b pb-2">Declaration</h3>
+                                            <p className="text-[13px] text-gray-800 mb-6 leading-relaxed">
+                                                I hereby confirm that I have read the implications of <b>Choice-{selectedChoice}</b> and I agree to proceed. I understand that this action cannot be undone and my choice is final for this round.
+                                            </p>
+                                            <div className="flex justify-end gap-3">
+                                                <button onClick={() => setShowChoiceConfirm(false)} className="px-4 py-1.5 border border-gray-400 rounded text-gray-800 hover:bg-gray-100 font-bold text-[13px]">Cancel</button>
+                                                <button onClick={handleChoiceConfirmSubmit} className="px-4 py-1.5 bg-[#006400] text-white rounded hover:bg-[#004d00] font-bold text-[13px] shadow-sm">Confirm & Submit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="w-full mt-6 border border-[#bee5eb] bg-[#d1ecf1] text-[#0c5460] p-4 rounded-[4px] text-[13px]">
                                     <p className="font-bold mb-1">NOTE: TO SEAT 'ALLOTTED' CANDIDATES:</p>
                                     <p>If a candidate fails to exercise any of the above 4 choices within the stipulated date and time, then the seat allotted to such candidate stands cancelled automatically without any further notice. They will not be allowed to participate in further rounds.</p>
                                 </div>
                             </motion.div>
+                            )
+                        )}
+
+                        {step === 'payment' && (
+                            <div className="w-full h-[100vh] flex items-center justify-center fixed inset-0 z-[200] bg-white overflow-hidden" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                {/* Diagonal Background */}
+                                <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                                    <div className="w-full h-[70%]" style={{ background: 'linear-gradient(135deg, #0A22C2 0%, #0d6efd 100%)', clipPath: 'polygon(0 0, 100% 0, 100% 60%, 0 30%)' }}></div>
+                                </div>
+
+                                <div className="relative z-10 flex w-full max-w-[900px] h-full max-h-[600px] items-start justify-between px-8 gap-12 mt-10">
+                                    {/* Left Side: HDFC / Payment Methods */}
+                                    <div className="w-1/2 flex flex-col justify-center items-start pt-10 relative hidden md:flex">
+                                        <div className="flex items-center gap-2 mb-6 shadow-sm border border-gray-200 bg-white">
+                                            <div className="font-bold text-[12px] bg-white text-black px-2 py-1">
+                                                <span className="text-red-600 mr-1">HDFC BANK</span>
+                                            </div>
+                                            <div className="font-bold text-[16px] text-black pr-2">Collect Now</div>
+                                        </div>
+
+                                        <div className="border border-gray-200 shadow-[0_10px_30px_rgba(0,0,0,0.15)] w-full bg-white relative">
+                                            <div className="bg-[#00103A] text-white text-[14px] py-3 text-center px-4 font-medium">
+                                                Pay through EASYEMI with HDFC Bank Credit Cards
+                                            </div>
+                                            <div className="p-5 flex flex-col items-start bg-white border-x border-b border-gray-200">
+                                                <div className="flex gap-3 items-center mb-4 font-bold text-lg">
+                                                    <span className="italic text-black font-black">UPI</span>
+                                                    <span className="text-blue-800 italic font-black">VISA</span>
+                                                    <div className="flex -space-x-1 items-center justify-center">
+                                                        <div className="w-5 h-5 rounded-full bg-red-500 mix-blend-multiply opacity-90"></div>
+                                                        <div className="w-5 h-5 rounded-full bg-orange-400 mix-blend-multiply opacity-90"></div>
+                                                    </div>
+                                                    <span className="italic text-gray-800 font-black tracking-tight">RuPay</span>
+                                                    <span className="italic text-blue-500 text-[10px] flex items-center leading-tight ml-2"><span className="bg-blue-600 text-white px-1 py-0.5 text-[8px] mr-0.5 rounded-sm">PCI</span>Compliant</span>
+                                                    <span className="italic text-[#0A22C2] text-sm font-black border-l pl-2 border-gray-300 ml-2">Razorpay</span>
+                                                </div>
+                                                <p className="text-[11px] text-gray-500">Accept, process and disburse digital payments for your business.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Right Side: Razorpay Checkout Modal */}
+                                    <div className="w-[360px] h-[550px] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-lg flex flex-col relative overflow-hidden self-center border border-gray-200 mt-[-30px]">
+                                        {/* Blue Header */}
+                                        <div className="bg-[#0A22C2] h-[260px] w-full flex flex-col items-center relative text-white pt-5 shrink-0">
+                                            <div className="absolute top-4 left-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setStep('landing')}>
+                                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                            </div>
+                                            <div className="absolute top-4 right-4 bg-white/20 p-1 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer hover:bg-white/30 transition-colors">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 21v-4a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v4"/><circle cx="12" cy="7" r="4"/><path d="M14 11l4 4"/><path d="M18 11l-4 4"/></svg>
+                                            </div>
+
+                                            {/* KEA Logo Square */}
+                                            <div className="w-16 h-16 bg-white rounded-[12px] mt-2 flex flex-col items-center justify-center p-1 mb-2 shadow-sm relative overflow-hidden">
+                                                <div className="flex flex-col items-center justify-center w-full h-full bg-white text-center leading-[1.1]">
+                                                    <span className="text-[#8B0000] font-bold text-[8px]">ಕರ್ನಾಟಕ ಪರೀಕ್ಷಾ ಪ್ರಾಧಿಕಾರ</span>
+                                                    <span className="text-[6px] text-black mt-[2px] font-bold">Karnataka Examinations Authority</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <h2 className="text-[16px] font-medium tracking-wide">KEA</h2>
+
+                                            <div className="mt-4 flex flex-col items-center">
+                                                <span className="text-[12px] opacity-80 mb-0.5">Total Amount</span>
+                                                <div className="flex items-start">
+                                                    <span className="text-[20px] mt-1 mr-1">₹</span>
+                                                    <span className="text-[38px] font-bold leading-none tracking-tight">7 karod</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* White Content Area */}
+                                        <div className="flex-1 bg-white p-5 flex flex-col rounded-t-[16px] -mt-4 z-10 relative">
+                                            <h3 className="text-[15px] font-bold text-gray-800 mb-0.5">Contact details</h3>
+                                            <p className="text-[12px] text-gray-500 mb-5">Enter mobile & email to proceed</p>
+
+                                            <div className="flex border border-gray-300 rounded-[4px] p-3 mb-auto focus-within:border-[#0A22C2] focus-within:shadow-[0_0_0_1px_#0A22C2] transition-all">
+                                                <div className="flex items-center gap-1 border-r border-gray-300 pr-3 mr-3 text-[14px] font-medium text-gray-700">
+                                                    🇮🇳 +91 
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+                                                </div>
+                                                <input type="text" placeholder="Mobile number" className="w-full outline-none text-[15px] font-medium text-gray-900" defaultValue="xxxxx zzzzz" />
+                                            </div>
+
+                                            <button 
+                                                onClick={() => {
+                                                    setIsPaymentComplete(true);
+                                                    setStep('payment_success');
+                                                }}
+                                                className="w-full bg-[#0A22C2] hover:bg-[#081b99] text-white py-[14px] rounded-[4px] text-[15px] font-bold shadow-md transition-all tracking-wide flex justify-center items-center gap-2"
+                                            >
+                                                Proceed to Pay
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {step === 'payment_success' && (
+                            <div className="w-full h-[100vh] flex flex-col items-center justify-center fixed inset-0 z-[200] bg-white overflow-hidden">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR70c6KiSoEHu-sv4tsowYfx5bu2x1LM-4Ihg&s" alt="Payment Successful" className="w-80 h-auto object-contain mb-8 rounded-lg" />
+                                <button 
+                                    onClick={() => setStep('landing')}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-10 py-3 rounded-full text-[16px] font-bold shadow-lg transition-all"
+                                >
+                                    Return to Dashboard
+                                </button>
+                            </div>
+                        )}
+
+                        {step === 'payment_receipt' && (
+                            <div className="w-full min-h-screen bg-gray-200 py-8 px-4 flex flex-col items-center justify-start z-[200] fixed inset-0 overflow-y-auto" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                <div className="max-w-[800px] w-full bg-white shadow-2xl p-0 mb-8 mt-4 relative border border-gray-300">
+                                    <div className="flex justify-end p-4 bg-gray-50 border-b border-gray-200 no-print sticky top-0 z-50 shadow-sm">
+                                        <button onClick={() => window.print()} className="bg-blue-600 text-white px-6 py-2 rounded-[4px] text-[14px] font-bold shadow hover:bg-blue-700 mr-3">Print</button>
+                                        <button onClick={() => setStep('landing')} className="bg-gray-600 text-white px-6 py-2 rounded-[4px] text-[14px] font-bold shadow hover:bg-gray-700">Back</button>
+                                    </div>
+                                    <div className="w-full flex flex-col items-center bg-white pb-8 px-4 sm:px-12 pt-8 print:p-0">
+                                        <img src="https://i.pinimg.com/236x/6a/2c/66/6a2c669640a19c5eaceed4ac95618ba8.jpg" alt="Receipt top" className="w-full h-auto object-contain" />
+                                        <img src="https://i.pinimg.com/originals/54/26/99/542699371275940351b64998a52a8de3.jpg?nii=t" alt="Receipt bottom" className="w-full h-auto object-contain mt-[-2px]" />
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {step === 'profile' && (
@@ -2082,8 +2298,9 @@ export default function CounselingSimulator() {
 
                                     {/* --- RIGHT SIDE: SELECTED OPTIONS (50%) --- */}
                                     <div className={cn("border border-[#b0b0b0] flex flex-col bg-white transition-all", globalConfig.currentRound === 1 ? "w-1/2" : "w-[40%]")}>
-                                        <div className="bg-[#006400] text-white px-3 py-1.5 text-[13px] font-bold border-b border-[#b0b0b0]">
-                                            Modify Selected Options
+                                        <div className="bg-[#006400] text-white px-3 py-1.5 text-[13px] font-bold border-b border-[#b0b0b0] flex justify-between items-center">
+                                            <span>Modify Selected Options</span>
+                                            {isOptionsLocked && <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded">LOCKED</span>}
                                         </div>
 
                                         {/* Table Header */}
@@ -2128,7 +2345,8 @@ export default function CounselingSimulator() {
                                                                             type="text"
                                                                             value={draftOptions[`${opt.collegeId}:::${opt.branchId}`] ?? options[`${opt.collegeId}:::${opt.branchId}`] ?? ''}
                                                                             onChange={(e) => handleDraftChange(opt.collegeId, opt.branchId, e.target.value)}
-                                                                            className="w-7 h-5 border border-gray-400 text-center text-[11px] font-bold bg-white focus:bg-[#FFFACD] outline-none shadow-inner"
+                                                                            disabled={isOptionsLocked}
+                                                                            className={cn("w-7 h-5 border border-gray-400 text-center text-[11px] font-bold bg-white focus:bg-[#FFFACD] outline-none shadow-inner", isOptionsLocked && "bg-gray-200 cursor-not-allowed")}
                                                                         />
                                                                     </div>
                                                                     <div className="flex-1 px-2 py-2 border-r border-[#E0E0E0] flex items-center">
@@ -2154,8 +2372,8 @@ export default function CounselingSimulator() {
                                             <div className="flex items-center justify-center gap-2">
                                                 <button
                                                     onClick={handleUpdateList}
-                                                    disabled={isSubmitting}
-                                                    className="bg-[#006400] text-white font-bold text-[13px] px-6 py-1 border-2 border-black rounded-[3px] shadow-sm hover:bg-[#004d00] transition-colors"
+                                                    disabled={isSubmitting || isOptionsLocked}
+                                                    className={cn("text-white font-bold text-[13px] px-6 py-1 border-2 border-black rounded-[3px] shadow-sm transition-colors", isSubmitting || isOptionsLocked ? "bg-gray-500" : "bg-[#006400] hover:bg-[#004d00]")}
                                                 >
                                                     {isSubmitting ? 'Updating...' : 'Update'}
                                                 </button>

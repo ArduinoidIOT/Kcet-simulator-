@@ -12,7 +12,7 @@ export const exportChoiceEntryToPDF = (
     // --- 1. OFFICIAL KEA STYLE HEADER ---
     doc.setFillColor(0, 82, 155); // KEA Blue #00529B
     doc.rect(0, 0, pageWidth, 40, 'F');
-    
+
     // Add Logo (Using the official URL)
     try {
         doc.addImage('https://www.crustindia.com/wp-content/uploads/2019/06/KEA-Logo.png', 'PNG', 14, 8, 24, 24);
@@ -24,7 +24,7 @@ export const exportChoiceEntryToPDF = (
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.text('KARNATAKA EXAMINATIONS AUTHORITY', pageWidth / 2 + 10, 15, { align: 'center' });
-    
+
     doc.setFontSize(10);
     doc.text('CET-2025 :: OPTION ENTRY CHOICE REPORT', pageWidth / 2, 25, { align: 'center' });
     doc.text('MOCK ROUND SEAT ALLOTMENT SYSTEM', pageWidth / 2, 32, { align: 'center' });
@@ -69,15 +69,15 @@ export const exportChoiceEntryToPDF = (
         head: [['Priority', 'Code', 'College Name', 'Course', 'Course Name']],
         body: tableData,
         theme: 'grid',
-        headStyles: { 
-            fillColor: [0, 82, 155], 
-            textColor: [255, 255, 255], 
-            fontSize: 8, 
+        headStyles: {
+            fillColor: [0, 82, 155],
+            textColor: [255, 255, 255],
+            fontSize: 8,
             fontStyle: 'bold',
             halign: 'center'
         },
-        bodyStyles: { 
-            fontSize: 7, 
+        bodyStyles: {
+            fontSize: 7,
             textColor: [33, 33, 33],
             cellPadding: 3
         },
@@ -105,7 +105,7 @@ export const exportChoiceEntryToPDF = (
         doc.text('I hereby declare that the options entered by me are correct to the best of my knowledge.', 14, finalY);
         doc.line(14, finalY + 20, 70, finalY + 20);
         doc.text('Candidate Signature', 14, finalY + 25);
-        
+
         doc.line(pageWidth - 70, finalY + 20, pageWidth - 14, finalY + 20);
         doc.text('KEA Authority Signature', pageWidth - 70, finalY + 25);
     }
