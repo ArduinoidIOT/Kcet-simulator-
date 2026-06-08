@@ -60,6 +60,10 @@ export default function LandingPage({
                         <div className="p-4 flex flex-col gap-5 text-[11px] font-bold text-black mt-2">
                             <div>
                                 <button onClick={() => {
+                                    if (choiceSubmitted && (selectedChoice === 1 || selectedChoice === 4)) {
+                                        alert(selectedChoice === 1 ? "Option entry is locked because you have accepted your allotted seat (Choice 1)." : "Option entry is locked because you have quit the counseling process (Choice 4).");
+                                        return;
+                                    }
 
                                     if (hasAgreedDeclaration) {
                                         if (userProfile.kcetNumber && userProfile.studentName && userProfile.rank) {
@@ -70,11 +74,17 @@ export default function LandingPage({
                                     } else {
                                         onNavigate('declaration');
                                     }
-                                }} className={`underline hover:text-blue-900 cursor-pointer text-left text-blue-700`}>
+                                }} className={`underline hover:text-blue-900 cursor-pointer text-left ${(choiceSubmitted && (selectedChoice === 1 || selectedChoice === 4)) ? 'text-gray-500' : 'text-blue-700'}`}>
                                     Candidates Option Entry
                                 </button>
                                 <p className="text-black font-normal mt-1 mb-2">
-                                    {choiceSubmitted ? <span className="text-blue-700">Modify your choices for the next round.</span> : 'Please complete the payment to enable option entry.'}
+                                    {(choiceSubmitted && (selectedChoice === 1 || selectedChoice === 4)) ? (
+                                        <span className="text-red-600">Option entry is locked.</span>
+                                    ) : choiceSubmitted ? (
+                                        <span className="text-blue-700">Modify your choices for the next round.</span>
+                                    ) : (
+                                        'Please complete the payment to enable option entry.'
+                                    )}
                                 </p>
                                 <div className="h-px bg-gray-300 w-[85%]" />
                             </div>

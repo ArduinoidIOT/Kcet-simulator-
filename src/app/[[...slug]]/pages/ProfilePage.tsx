@@ -208,6 +208,7 @@ export default function ProfilePage({
                                         gender: 'Male'
                                     });
                                     alert('✅ All simulation data has been reset.');
+                                    window.location.href = '/login';
                                 }}
                                 className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-300 text-[11px] font-black uppercase tracking-wider rounded transition-colors shadow-sm"
                             >

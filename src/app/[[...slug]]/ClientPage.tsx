@@ -122,7 +122,12 @@ export default function CounselingSimulator() {
         return null;
     });
 
-    const [hasAgreedDeclaration, setHasAgreedDeclaration] = useState(false);
+    const [hasAgreedDeclaration, setHasAgreedDeclaration] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('sim_has_agreed_declaration') === 'true';
+        }
+        return false;
+    });
     const [isDeclarationChecked, setIsDeclarationChecked] = useState(false);
 
     // Load data
@@ -285,6 +290,12 @@ export default function CounselingSimulator() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            localStorage.setItem('sim_has_agreed_declaration', String(hasAgreedDeclaration));
+        }
+    }, [hasAgreedDeclaration]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
             if (previousAllotment) localStorage.setItem('sim_previous_allotment', JSON.stringify(previousAllotment));
             else localStorage.removeItem('sim_previous_allotment');
         }
@@ -309,15 +320,7 @@ export default function CounselingSimulator() {
                 if (saved.submittedRound) setSubmittedRound(saved.submittedRound);
                 if (saved.previousAllotment) setPreviousAllotment(saved.previousAllotment);
 
-                if (saved.step) {
-                    if (saved.step === 'allotted') {
-                        setStep('landing');
-                    } else {
-                        setStep(saved.step as any);
-                    }
-                } else if (saved.userProfile?.rank) {
-                    setStep('entry');
-                }
+
             } catch (err) {
                 console.error("Error loading simulation:", err);
             }
@@ -588,34 +591,6 @@ export default function CounselingSimulator() {
         setIsSubmitting(true);
         setTimeout(async () => {
             setIsSubmitting(false);
-            let allottedSeat = null;
-            const userRank = parseInt(userProfile.rank?.replace(/,/g, ''));
-            for (const opt of selectedOptions) {
-                const col = colleges.find((c: any) => c.college_id === opt.collegeId);
-                if (!col) continue;
-                const branchCutoffs = col.kcet_cutoffs.filter((cut: any) =>
-                    cut.branch_id === opt.branchId ||
-                    getRawBranchIds(opt.branchId).includes(cut.branch_id)
-                );
-                const gmCutoff = branchCutoffs.find((cut: any) => cut.category === 'GM');
-                const gmRank = gmCutoff?.r1 || gmCutoff?.r2 || gmCutoff?.r3 || null;
-                const catCutoff = branchCutoffs.find((cut: any) => cut.category === userProfile.category);
-                const catRank = catCutoff?.r1 || catCutoff?.r2 || catCutoff?.r3 || null;
-                if ((gmRank && userRank <= gmRank) || (catRank && userRank <= catRank)) {
-                    allottedSeat = {
-                        collegeId: opt.collegeId,
-                        collegeName: opt.collegeName,
-                        branchId: opt.branchId,
-                        branchName: opt.branchName,
-                        cutoffRank: gmRank && userRank <= gmRank ? gmRank : catRank,
-                        collegeFees: col.fees || "96,000",
-                        choiceNo: opt.priority
-                    };
-                    break;
-                }
-            }
-            setMockAllotment(allottedSeat);
-            await saveSimulationState('landing', { mockAllotment: allottedSeat });
             setStep('landing');
         }, 1500);
     };
@@ -775,7 +750,7 @@ export default function CounselingSimulator() {
                 setCetNo(mockNo);
                 localStorage.setItem('sim_cet_no', mockNo);
             }
-            setStep('landing');
+            setStep('profile');
         }
     }, [user, step]);
 
@@ -783,7 +758,7 @@ export default function CounselingSimulator() {
         localStorage.setItem('sim_cet_no', cetId);
         setCetNo(cetId);
         setAsGuest();
-        setStep('landing');
+        setStep('profile');
     };
 
     const handleLogout = () => {

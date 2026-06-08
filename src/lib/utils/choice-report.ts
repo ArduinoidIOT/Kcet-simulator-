@@ -10,14 +10,14 @@ export const exportChoiceEntryToPDF = (
     const pageWidth = doc.internal.pageSize.width;
 
     // --- 1. OFFICIAL KEA STYLE HEADER ---
-    
+
     // Left Logo (KEA)
     try {
         doc.addImage(KEA_LOGO_BASE64, 'PNG', 14, 10, 24, 24);
     } catch (e) {
         console.warn("KEA Logo could not be loaded into PDF", e);
     }
-    
+
     // Right Logo (Karnataka Emblem)
     try {
         doc.addImage(KARNATAKA_LOGO_BASE64, 'PNG', pageWidth - 38, 10, 24, 24);
@@ -30,7 +30,7 @@ export const exportChoiceEntryToPDF = (
     doc.setFont('helvetica', 'bold');
     doc.text('KARNATAKA EXAMINATIONS AUTHORITY', pageWidth / 2, 18, { align: 'center' });
     doc.text('ADMISSION TO UGCET & OTHER PROFESSIONAL COURSES- 2026', pageWidth / 2, 25, { align: 'center' });
-    doc.text('UGCET-2026 OPTIONS LIST', pageWidth / 2, 32, { align: 'center' });
+    doc.text('UGCET-2026 OPTIONS LIST SIMULATION ', pageWidth / 2, 32, { align: 'center' });
 
     // Solid Line
     doc.setLineWidth(0.5);
@@ -43,7 +43,7 @@ export const exportChoiceEntryToPDF = (
     doc.rect(14, currentY, pageWidth - 28, 8, 'S');
     // Draw vertical middle line
     doc.line(pageWidth / 2, currentY, pageWidth / 2, currentY + 8);
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text(`CET NO: ${candidateInfo.cetNo}`, (pageWidth / 4) + 7, currentY + 5.5, { align: 'center' });

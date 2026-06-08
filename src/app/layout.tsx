@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { Zap } from "lucide-react";
@@ -8,8 +7,6 @@ import { AuthProvider } from "@/lib/contexts/AuthContext";
 import { CollegeProvider } from "@/lib/contexts/CollegeContext";
 import { ThemeProvider } from "@/lib/contexts/ThemeContext";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "KCET Predictor",
@@ -29,8 +26,11 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <ThemeProvider>
         <AuthProvider>
           <CollegeProvider>
